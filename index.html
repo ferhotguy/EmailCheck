@@ -1,347 +1,431 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Email Phishing Checker</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        h1, h2, h3 {
-            color: #2c3e50;
-        }
-        h1 {
-            text-align: center;
-        }
-        #email-form, #result {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        .hidden {
-            display: none;
-        }
-        .phishing {
-            color: #c0392b;
-        }
-        .suspicious {
-            color: #f39c12;
-        }
-        .legitimate {
-            color: #27ae60;
-        }
-        ul {
-            padding-left: 20px;
-        }
-        .disclaimer {
-            font-size: 12px;
-            color: #7f8c8d;
-            text-align: center;
-            margin-top: 20px;
-        }
-        .auth-result {
-            margin-bottom: 10px;
-        }
-        .auth-result span {
-            font-weight: bold;
-        }
-        .pass {
-            color: #27ae60;
-        }
-        .fail {
-            color: #c0392b;
-        }
-        .neutral {
-            color: #f39c12;
-        }
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .checkbox-container input[type="checkbox"] {
-            margin-right: 10px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Email Phishing Checker</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+    h1, h2, h3 {
+        color: #2c3e50;
+    }
+    h1 {
+        text-align: center;
+    }
+    #email-form, #result, .guide {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+    }
+    button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    button:hover {
+        background-color: #2980b9;
+    }
+    .hidden {
+        display: none;
+    }
+    .phishing {
+        color: #c0392b;
+    }
+    .suspicious {
+        color: #f39c12;
+    }
+    .legitimate {
+        color: #27ae60;
+    }
+    ul {
+        padding-left: 20px;
+    }
+    .disclaimer {
+        font-size: 12px;
+        color: #7f8c8d;
+        text-align: center;
+        margin-top: 20px;
+    }
+    .auth-result {
+        margin-bottom: 10px;
+    }
+    .auth-result span {
+        font-weight: bold;
+    }
+    .pass {
+        color: #27ae60;
+    }
+    .fail {
+        color: #c0392b;
+    }
+    .neutral {
+        color: #f39c12;
+    }
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        gap: 5px;
+    }
+    .guide h2 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+    .guide ol {
+        padding-left: 20px;
+    }
+    .textarea-container {
+        position: relative;
+        margin-bottom: 10px;
+    }
+    .icon-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 10px;
+    }
+    .icon-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        transition: transform 0.2s;
+        opacity: 1;
+    }
+    .icon-button:hover {
+        transform: scale(1.1);
+    }
+    .icon-button svg {
+        width: 24px;
+        height: 24px;
+        stroke: #3498db;
+        fill: none;
+    }
+</style>
 </head>
 <body>
-    <h1>Advanced Email Phishing Checker</h1>
-    <div id="email-form">
+<h1>Advanced Email Phishing Checker</h1>
+<div id="email-form">
+    <div class="textarea-container">
         <textarea id="email-content" rows="20" placeholder="Paste your full email content here, including headers"></textarea>
-        <div class="checkbox-container">
-            <input type="checkbox" id="expected-email" name="expected-email">
-            <label for="expected-email">Were you expecting this email?</label>
-        </div>
-        <button onclick="analyzeEmail()">Analyze Email</button>
     </div>
-    <div id="result" class="hidden"></div>
-    <p class="disclaimer">This tool provides a basic assessment and should not be the sole factor in determining email legitimacy.</p>
+    <div class="checkbox-container">
+        <input type="checkbox" id="expected-email" name="expected-email">
+        <label for="expected-email">Expected Email</label>
+    </div>
+    <button onclick="analyzeEmail()">Analyze Email</button>
+    <div class="icon-container">
+        <button class="icon-button" onclick="clearForm()" title="Clear form">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+        </button>
+    </div>
+</div>
+<div id="result" class="hidden">
+    <div id="result-content"></div>
+    <div class="icon-container">
+        <button class="icon-button" onclick="copyToClipboard()" title="Copy results to clipboard">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            </svg>
+        </button>
+    </div>
+</div>
+<div class="guide">
+    <h2>How to get original email headers from Gmail</h2>
+    <ol>
+        <li>Open the email message in Gmail</li>
+        <li>Click on the three dots (More options) next to the Reply button</li>
+        <li>Select "Show original" from the dropdown menu</li>
+        <li>The original message will open in a new tab</li>
+        <li>Copy all the content and paste it into the textarea above</li>
+    </ol>
+</div>
+<div class="guide">
+    <h2>How to get original email headers from Outlook</h2>
+    <ol>
+        <li>Open the email message in Outlook</li>
+        <li>Click on the "File" tab in the top-left corner</li>
+        <li>Click on "Properties"</li>
+        <li>In the "Internet Headers" box, you'll see the full email headers</li>
+        <li>Copy all the content and paste it into the textarea above</li>
+    </ol>
+</div>
+<p class="disclaimer">This tool provides a basic assessment and should not be the sole factor in determining email legitimacy.</p>
 
-    <script>
-        function extractEmailInfo(emailContent) {
-            const fromRegex = /^From:.*?([a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>/im;
-            const authResultsRegex = /^Authentication-Results:[\s\S]*?(?=\n\S)/im;
-            const subjectRegex = /^Subject: (.*)$/im;
-            const dateRegex = /^Date: (.*)$/im;
-            const replyToRegex = /^Reply-To:.*?([a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/im;
+<script>
+    function extractEmailInfo(emailContent) {
+        const fromRegex = /^From:.*?([a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>/im;
+        const authResultsRegex = /^Authentication-Results:[\s\S]*?(?=\n\S)/im;
+        const subjectRegex = /^Subject: (.*)$/im;
+        const dateRegex = /^Date: (.*)$/im;
+        const replyToRegex = /^Reply-To:.*?([a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/im;
 
-            const fromMatch = emailContent.match(fromRegex);
-            const authResultsMatch = emailContent.match(authResultsRegex);
-            const subjectMatch = emailContent.match(subjectRegex);
-            const dateMatch = emailContent.match(dateRegex);
-            const replyToMatch = emailContent.match(replyToRegex);
+        const fromMatch = emailContent.match(fromRegex);
+        const authResultsMatch = emailContent.match(authResultsRegex);
+        const subjectMatch = emailContent.match(subjectRegex);
+        const dateMatch = emailContent.match(dateRegex);
+        const replyToMatch = emailContent.match(replyToRegex);
 
-            const fromEmail = fromMatch ? fromMatch[1] : '';
-            const fromDomain = fromEmail.split('@')[1] || '';
-            const authResults = authResultsMatch ? authResultsMatch[0] : '';
-            const subject = subjectMatch ? subjectMatch[1] : '';
-            const date = dateMatch ? dateMatch[1] : '';
-            const replyTo = replyToMatch ? replyToMatch[1] : '';
+        const fromEmail = fromMatch ? fromMatch[1] : '';
+        const fromDomain = fromEmail.split('@')[1] || '';
+        const authResults = authResultsMatch ? authResultsMatch[0] : '';
+        const subject = subjectMatch ? subjectMatch[1] : '';
+        const date = dateMatch ? dateMatch[1] : '';
+        const replyTo = replyToMatch ? replyToMatch[1] : '';
 
-            // Parse authentication results
-            const spfRegex = /spf=(\S+)/i;
-            const dkimRegex = /dkim=(\S+)/i;
-            const dmarcRegex = /dmarc=(\S+)/i;
+        // Parse authentication results
+        const spfRegex = /spf=(\S+)/i;
+        const dkimRegex = /dkim=(\S+)/i;
+        const dmarcRegex = /dmarc=(\S+)/i;
 
-            const spfResult = authResults.match(spfRegex) ? authResults.match(spfRegex)[1].toLowerCase() : 'neutral';
-            const dkimResult = authResults.match(dkimRegex) ? authResults.match(dkimRegex)[1].toLowerCase() : 'neutral';
-            const dmarcResult = authResults.match(dmarcRegex) ? authResults.match(dmarcRegex)[1].toLowerCase() : 'neutral';
+        const spfResult = authResults.match(spfRegex) ? authResults.match(spfRegex)[1].toLowerCase() : 'neutral';
+        const dkimResult = authResults.match(dkimRegex) ? authResults.match(dkimRegex)[1].toLowerCase() : 'neutral';
+        const dmarcResult = authResults.match(dmarcRegex) ? authResults.match(dmarcRegex)[1].toLowerCase() : 'neutral';
 
-            return { fromEmail, fromDomain, spfResult, dkimResult, dmarcResult, subject, date, replyTo };
+        return { fromEmail, fromDomain, spfResult, dkimResult, dmarcResult, subject, date, replyTo };
+    }
+
+    function checkPhishing(emailContent, isExpected) {
+        let score = 0;
+        const reasons = [];
+
+        const { fromEmail, fromDomain, spfResult, dkimResult, dmarcResult, subject, date, replyTo } = extractEmailInfo(emailContent);
+
+        // Check if the email was expected
+        if (isExpected) {
+            score -= 2;
+            reasons.push('Email was expected by the recipient');
+        } else {
+            score += 1;
+            reasons.push('Email was not expected by the recipient');
         }
 
-        function checkPhishing(emailContent, isExpected) {
-            let score = 0;
-            const reasons = [];
-
-            const { fromEmail, fromDomain, spfResult, dkimResult, dmarcResult, subject, date, replyTo } = extractEmailInfo(emailContent);
-
-
-            // Check if the email was expected
-            if (isExpected) {
-                score -= 2;
-                reasons.push('Email was expected by the recipient');
-            } else {
-                score += 1;
-                reasons.push('Email was not expected by the recipient');
-            }
-
-            // Check for urgent language
-            if (/urgent|immediate action|account suspended|security alert|unusual activity/i.test(emailContent)) {
-                score += 2;
-                reasons.push('Contains urgent or threatening language');
-            }
-
-            // Check for suspicious links
-            if (/http:\/\/bit\.ly|http:\/\/goo\.gl|http:\/\/tinyurl\.com/i.test(emailContent)) {
-                score += 2;
-                reasons.push('Contains suspicious shortened links');
-            }
-
-            // Check for requests for personal information
-            if (/password|credit card|social security|bank account|update your information/i.test(emailContent)) {
-                score += 3;
-                reasons.push('Requests sensitive personal information');
-            }
-
-            // Check for generic greetings
-            if (/^Dear Sir\/Madam|^Dear Customer|^Dear User/i.test(emailContent)) {
-                score += 1;
-                reasons.push('Uses generic greeting');
-            }
-
-            // Check for mismatched URLs
-            const urlRegex = /<a\s+(?:[^>]*?\s+)?href="([^"]*)"[^>]*>(.*?)<\/a>/gi;
-            let match;
-            while ((match = urlRegex.exec(emailContent)) !== null) {
-                const href = match[1];
-                const linkText = match[2];
-                if (href !== linkText && !linkText.includes('...')) {
-                    score += 2;
-                    reasons.push('Contains mismatched URLs');
-                    break;
-                }
-            }
-
-            // Check for suspicious attachments
-            if (/\.exe|\.zip|\.scr|\.js/i.test(emailContent)) {
-                score += 3;
-                reasons.push('Contains suspicious attachment types');
-            }
-
-            // Check for poor spelling and grammar
-            const spellingErrors = emailContent.match(/\b(teh|adn|thier|recieve|alot)\b/gi);
-            if (spellingErrors && spellingErrors.length > 2) {
-                score += 1;
-                reasons.push('Contains multiple spelling errors');
-            }
-
-            // Check for fake domains
-            if (fromDomain && !/^[\w-]+\.[\w-]+$/.test(fromDomain)) {
-                score += 2;
-                reasons.push('Sender domain looks suspicious');
-            }
-
-
-            if (spfResult !== 'pass') score += 1;
-            if (dkimResult !== 'pass') score += 1;
-            if (dmarcResult !== 'pass') score += 1;
-
-            // Improved domain spoofing check
-            const headerFromRegex = /^From:.*?<([^>]+)>/im;
-            const headerFromMatch = emailContent.match(headerFromRegex);
-            const headerFromDomain = headerFromMatch ? headerFromMatch[1].split('@')[1].toLowerCase() : '';
-            const isDomainSpoofed = headerFromDomain !== fromDomain.toLowerCase();
-
-            if (isDomainSpoofed) {
-                score += 3;
-                reasons.push('Possible domain spoofing detected');
-            }
-
-            // Check for suspicious subject lines
-            if (/account.*verify|security.*update|password.*expired/i.test(subject)) {
-                score += 2;
-                reasons.push('Suspicious subject line');
-            }
-
-            // Check for pressure tactics
-            if (/limited time|act now|offer expires|last chance/i.test(emailContent)) {
-                score += 2;
-                reasons.push('Uses pressure tactics');
-            }
-
-            // Check for mismatched Reply-To
-            if (replyTo && replyTo.toLowerCase() !== fromEmail.toLowerCase()) {
-                score += 2;
-                reasons.push('Reply-To address doesn\'t match sender');
-            }
-
-            // Check for excessive capitalization
-            if (/[A-Z]{5,}/.test(subject) || /[A-Z]{5,}/.test(emailContent)) {
-                score += 1;
-                reasons.push('Contains excessive capitalization');
-            }
-
-            // Check for common phishing keywords
-            const phishingKeywords = /verify.*account|confirm.*identity|update.*payment|suspicious.*activity|login.*attempt/i;
-            if (phishingKeywords.test(emailContent)) {
-                score += 2;
-                reasons.push('Contains common phishing keywords');
-            }
-
-            // Check for fake invoice scams
-            if (/invoice|payment due|outstanding balance/i.test(subject) && /please find attached|see attached invoice/i.test(emailContent)) {
-                score += 2;
-                reasons.push('Possible fake invoice scam');
-            }
-
-            // Check for impersonation of well-known companies
-            const wellKnownCompanies = /paypal|amazon|apple|microsoft|google|facebook|twitter/i;
-            if (wellKnownCompanies.test(fromDomain) && !wellKnownCompanies.test(headerFromDomain)) {
-                score += 3;
-                reasons.push('Possible impersonation of a well-known company');
-            }
-
-            // Check for COVID-19 related scams
-            if (/covid|coronavirus|pandemic|vaccine|relief fund/i.test(emailContent)) {
-                score += 1;
-                reasons.push('Contains COVID-19 related content (be cautious of potential scams)');
-            }
-
-            let result;
-            if (score >= 7) {
-                result = 'Likely Phishing';
-            } else if (score >= 4) {
-                result = 'Suspicious';
-            } else {
-                result = 'Likely Legitimate';
-                if (reasons.length === 1 && reasons[0].startsWith('Email was')) {
-                    reasons.push('No obvious phishing indicators detected');
-                }
-            }
-
-            return { result, score, reasons, spfResult, dkimResult, dmarcResult, isDomainSpoofed, fromEmail, subject, date };
+        // Check for urgent language
+        if (/urgent|immediate action|account suspended|security alert|unusual activity/i.test(emailContent)) {
+            score += 2;
+            reasons.push('Contains urgent or threatening language');
         }
 
-        function analyzeEmail() {
-            const emailContent = document.getElementById('email-content').value;
-            const isExpected = document.getElementById('expected-email').checked;
-            const { result, score, reasons, spfResult, dkimResult, dmarcResult, isDomainSpoofed, fromEmail, subject, date } = checkPhishing(emailContent, isExpected);
-
-            let resultClass;
-            switch (result) {
-                case 'Likely Phishing':
-                    resultClass = 'phishing';
-                    break;
-                case 'Suspicious':
-                    resultClass = 'suspicious';
-                    break;
-                case 'Likely Legitimate':
-                    resultClass = 'legitimate';
-                    break;
-            }
-
-            const resultHTML = `
-                <h2 class="${resultClass}">${result}</h2>
-                <p>Phishing Score: ${score}</p>
-                <h3>Email Details:</h3>
-                <p>From: ${fromEmail}</p>
-                <p>Subject: ${subject}</p>
-                <p>Date: ${date}</p>
-                <h3>Authentication Results:</h3>
-                <div class="auth-result">
-                    <span>SPF:</span> <span class="${spfResult}">${spfResult.toUpperCase()}</span>
-                </div>
-                <div class="auth-result">
-                    <span>DKIM:</span> <span class="${dkimResult}">${dkimResult.toUpperCase()}</span>
-                </div>
-                <div class="auth-result">
-                    <span>DMARC:</span> <span class="${dmarcResult}">${dmarcResult.toUpperCase()}</span>
-                </div>
-                <div class="auth-result">
-                    <span>Domain Spoofing:</span> <span class="${isDomainSpoofed ? 'fail' : 'pass'}">${isDomainSpoofed ? 'DETECTED' : 'NOT DETECTED'}</span>
-                </div>
-                <h3>Reasons:</h3>
-                <ul>
-                    ${reasons.map(reason =>   `<li>${reason}</li>`).join('')}
-                </ul>
-            `;
-
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = resultHTML;
-            resultDiv.classList.remove('hidden');
+        // Check for suspicious links
+        if (/http:\/\/bit\.ly|http:\/\/goo\.gl|http:\/\/tinyurl\.com/i.test(emailContent)) {
+            score += 2;
+            reasons.push('Contains suspicious shortened links');
         }
-    </script>
+
+        // Check for requests for personal information
+        if (/password|credit card|social security|bank account|update your information/i.test(emailContent)) {
+            score += 3;
+            reasons.push('Requests sensitive personal information');
+        }
+
+        // Check for generic greetings
+        if (/^Dear Sir\/Madam|^Dear Customer|^Dear User/i.test(emailContent)) {
+            score += 1;
+            reasons.push('Uses generic greeting');
+        }
+
+        // Check for mismatched URLs
+        const urlRegex = /<a\s+(?:[^>]*?\s+)?href="([^"]*)"[^>]*>(.*?)<\/a>/gi;
+        let match;
+        while ((match = urlRegex.exec(emailContent)) !== null) {
+            const href = match[1];
+            const linkText = match[2];
+            if (href !== linkText && !linkText.includes('...')) {
+                score += 2;
+                reasons.push('Contains mismatched URLs');
+                break;
+            }
+        }
+
+        // Check for suspicious attachments
+        if (/\.exe|\.zip|\.scr|\.js/i.test(emailContent)) {
+            score += 3;
+            reasons.push('Contains suspicious attachment types');
+        }
+
+        // Check for poor spelling and grammar
+        const spellingErrors = emailContent.match(/\b(teh|adn|thier|recieve|alot)\b/gi);
+        if (spellingErrors && spellingErrors.length > 2) {
+            score += 1;
+            reasons.push('Contains multiple spelling errors');
+        }
+
+        // Check for fake domains
+        if (fromDomain && !/^[\w-]+\.[\w-]+$/.test(fromDomain)) {
+            score += 2;
+            reasons.push('Sender domain looks suspicious');
+        }
+
+        if (spfResult !== 'pass') score += 1;
+        if (dkimResult !== 'pass') score += 1;
+        if (dmarcResult !== 'pass') score += 1;
+
+        // Improved domain spoofing check
+        const headerFromRegex = /^From:.*?<([^>]+)>/im;
+        const headerFromMatch = emailContent.match(headerFromRegex);
+        const headerFromDomain = headerFromMatch ? headerFromMatch[1].split('@')[1].toLowerCase() : '';
+        const isDomainSpoofed = headerFromDomain !== fromDomain.toLowerCase();
+
+        if (isDomainSpoofed) {
+            score += 3;
+            reasons.push('Possible domain spoofing detected');
+        }
+
+        // Check for suspicious subject lines
+        if (/account.*verify|security.*update|password.*expired/i.test(subject)) {
+            score += 2;
+            reasons.push('Suspicious subject line');
+        }
+
+        // Check for pressure tactics
+        if (/limited time|act now|offer expires|last chance/i.test(emailContent)) {
+            score += 2;
+            reasons.push('Uses pressure tactics');
+        }
+
+        // Check for mismatched Reply-To
+        if (replyTo && replyTo.toLowerCase() !== fromEmail.toLowerCase()) {
+            score += 2;
+            reasons.push('Reply-To address doesn\'t match sender');
+        }
+
+        // Check for excessive capitalization
+        if (/[A-Z]{5,}/.test(subject) || /[A-Z]{5,}/.test(emailContent)) {
+            score += 1;
+            reasons.push('Contains excessive capitalization');
+        }
+
+        // Check for common phishing keywords
+        const phishingKeywords = /verify.*account|confirm.*identity|update.*payment|suspicious.*activity|login.*attempt/i;
+        if (phishingKeywords.test(emailContent)) {
+            score += 2;
+            reasons.push('Contains common phishing keywords');
+        }
+
+        // Check for fake invoice scams
+        if (/invoice|payment due|outstanding balance/i.test(subject) && /please find attached|see attached invoice/i.test(emailContent)) {
+            score += 2;
+            reasons.push('Possible fake invoice scam');
+        }
+
+        // Check for impersonation of well-known companies
+        const wellKnownCompanies = /paypal|amazon|apple|microsoft|google|facebook|twitter/i;
+        if (wellKnownCompanies.test(fromDomain) && !wellKnownCompanies.test(headerFromDomain)) {
+            score += 3;
+            reasons.push('Possible impersonation of a well-known company');
+        }
+
+        // Check for COVID-19 related scams
+        if (/covid|coronavirus|pandemic|vaccine|relief fund/i.test(emailContent)) {
+            score += 1;
+            reasons.push('Contains COVID-19 related content (be cautious of potential scams)');
+        }
+
+        let result;
+        if (score >= 7) {
+            result = 'Likely  Phishing';
+        } else if (score >= 4) {
+            result = 'Suspicious';
+        } else {
+            result = 'Likely Legitimate';
+            if (reasons.length === 1 && reasons[0].startsWith('Email was')) {
+                reasons.push('No obvious phishing indicators detected');
+            }
+        }
+
+        return { result, score, reasons, spfResult, dkimResult, dmarcResult, isDomainSpoofed, fromEmail, subject, date };
+    }
+
+    function analyzeEmail() {
+        const emailContent = document.getElementById('email-content').value;
+        const isExpected = document.getElementById('expected-email').checked;
+        const { result, score, reasons, spfResult, dkimResult, dmarcResult, isDomainSpoofed, fromEmail, subject, date } = checkPhishing(emailContent, isExpected);
+
+        let resultClass;
+        switch (result) {
+            case 'Likely Phishing':
+                resultClass = 'phishing';
+                break;
+            case 'Suspicious':
+                resultClass = 'suspicious';
+                break;
+            case 'Likely Legitimate':
+                resultClass = 'legitimate';
+                break;
+        }
+
+        const resultHTML = `
+            <h2 class="${resultClass}">${result}</h2>
+            <p>Phishing Score: ${score}</p>
+            <h3>Email Details:</h3>
+            <p>From: ${fromEmail}</p>
+            <p>Subject: ${subject}</p>
+            <p>Date: ${date}</p>
+            <h3>Authentication Results:</h3>
+            <div class="auth-result">
+                <span>SPF:</span> <span class="${spfResult}">${spfResult.toUpperCase()}</span>
+            </div>
+            <div class="auth-result">
+                <span>DKIM:</span> <span class="${dkimResult}">${dkimResult.toUpperCase()}</span>
+            </div>
+            <div class="auth-result">
+                <span>DMARC:</span> <span class="${dmarcResult}">${dmarcResult.toUpperCase()}</span>
+            </div>
+            <div class="auth-result">
+                <span>Domain Spoofing:</span> <span class="${isDomainSpoofed ? 'fail' : 'pass'}">${isDomainSpoofed ? 'DETECTED' : 'NOT DETECTED'}</span>
+            </div>
+            <h3>Reasons:</h3>
+            <ul>
+                ${reasons.map(reason => `<li>${reason}</li>`).join('')}
+            </ul>
+        `;
+
+        const resultDiv = document.getElementById('result');
+        const resultContentDiv = document.getElementById('result-content');
+        resultContentDiv.innerHTML = resultHTML;
+        resultDiv.classList.remove('hidden');
+    }
+
+    function clearForm() {
+        document.getElementById('email-content').value = '';
+        document.getElementById('expected-email').checked = false;
+        document.getElementById('result').classList.add('hidden');
+    }
+
+    function copyToClipboard() {
+        const resultContent = document.getElementById('result-content').innerText;
+        navigator.clipboard.writeText(resultContent).then(() => {
+            alert('Analysis results copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+        });
+    }
+</script>
 </body>
 </html>
